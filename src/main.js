@@ -30,13 +30,15 @@ Vue.component('pro-layout', ProLayout)
 Vue.component('page-container', PageHeaderWrapper)
 Vue.component('page-header-wrapper', PageHeaderWrapper)
 
-window.umi_plugin_ant_themeVar = themePluginConfig.theme
-
-new Vue({
-  router,
-  store,
-  i18n,
-  // init localstorage, vuex, Logo message
-  created: bootstrap,
-  render: h => h(App)
-}).$mount('#app')
+// 确保在应用启动时加载中文语言
+store.dispatch('setLang', 'zh-CN').then(() => {
+  window.umi_plugin_ant_themeVar = themePluginConfig.theme
+  new Vue({
+    router,
+    store,
+    i18n,
+    // init localstorage, vuex, Logo message
+    created: bootstrap,
+    render: h => h(App)
+  }).$mount('#app')
+})

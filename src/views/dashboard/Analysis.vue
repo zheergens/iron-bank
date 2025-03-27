@@ -2,61 +2,61 @@
   <div>
     <a-row :gutter="24">
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" :title="$t('dashboard.analysis.total-sales')" total="￥126,560">
+        <chart-card :loading="loading" :title="$t('dashboard.analysis.total-sales')" :total="totalSales.total">
           <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
-            <trend flag="up" style="margin-right: 16px;">
+            <trend :flag="totalSales.weekGrowth.startsWith('-') ? 'down' : 'up'" style="margin-right: 16px;">
               <span slot="term">{{ $t('dashboard.analysis.week') }}</span>
-              12%
+              {{ totalSales.weekGrowth }}
             </trend>
-            <trend flag="down">
+            <trend :flag="totalSales.dayGrowth.startsWith('-') ? 'down' : 'up'">
               <span slot="term">{{ $t('dashboard.analysis.day') }}</span>
-              11%
+              {{ totalSales.dayGrowth }}
             </trend>
           </div>
-          <template slot="footer">{{ $t('dashboard.analysis.day-sales') }}<span>￥ 234.56</span></template>
+          <template slot="footer">{{ $t('dashboard.analysis.day-sales') }}<span>{{ totalSales.daySales }}</span></template>
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" :title="$t('dashboard.analysis.visits')" :total="8846 | NumberFormat">
+        <chart-card :loading="loading" :title="$t('dashboard.analysis.visits')" :total="visitData.total | NumberFormat">
           <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
             <mini-area />
           </div>
-          <template slot="footer">{{ $t('dashboard.analysis.day-visits') }}<span> {{ '1234' | NumberFormat }}</span></template>
+          <template slot="footer">{{ $t('dashboard.analysis.day-visits') }}<span> {{ visitData.dailyVisits | NumberFormat }}</span></template>
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" :title="$t('dashboard.analysis.payments')" :total="6560 | NumberFormat">
+        <chart-card :loading="loading" :title="$t('dashboard.analysis.payments')" :total="payments.total | NumberFormat">
           <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
             <mini-bar />
           </div>
-          <template slot="footer">{{ $t('dashboard.analysis.conversion-rate') }} <span>60%</span></template>
+          <template slot="footer">{{ $t('dashboard.analysis.conversion-rate') }} <span>{{ payments.conversionRate }}</span></template>
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" :title="$t('dashboard.analysis.operational-effect')" total="78%">
+        <chart-card :loading="loading" :title="$t('dashboard.analysis.operational-effect')" :total="operationalEffect.total">
           <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
-            <mini-progress color="rgb(19, 194, 194)" :target="80" :percentage="78" height="8px" />
+            <mini-progress color="rgb(19, 194, 194)" :target="80" :percentage="Number(operationalEffect.total.replace('%', ''))" height="8px" />
           </div>
           <template slot="footer">
-            <trend flag="down" style="margin-right: 16px;">
+            <trend :flag="operationalEffect.weekGrowth.startsWith('-') ? 'down' : 'up'" style="margin-right: 16px;">
               <span slot="term">{{ $t('dashboard.analysis.week') }}</span>
-              12%
+              {{ operationalEffect.weekGrowth }}
             </trend>
-            <trend flag="up">
+            <trend :flag="operationalEffect.dayGrowth.startsWith('-') ? 'down' : 'up'">
               <span slot="term">{{ $t('dashboard.analysis.day') }}</span>
-              80%
+              {{ operationalEffect.dayGrowth }}
             </trend>
           </template>
         </chart-card>
@@ -212,7 +212,6 @@
 </template>
 
 <script>
-import moment from 'moment'
 import {
   ChartCard,
   MiniArea,
@@ -225,83 +224,9 @@ import {
   MiniSmoothArea
 } from '@/components'
 import { baseMixin } from '@/store/app-mixin'
-
-const barData = []
-const barData2 = []
-for (let i = 0; i < 12; i += 1) {
-  barData.push({
-    x: `${i + 1}月`,
-    y: Math.floor(Math.random() * 1000) + 200
-  })
-  barData2.push({
-    x: `${i + 1}月`,
-    y: Math.floor(Math.random() * 1000) + 200
-  })
-}
-
-const rankList = []
-for (let i = 0; i < 7; i++) {
-  rankList.push({
-    name: '白鹭岛 ' + (i + 1) + ' 号店',
-    total: 1234.56 - i * 100
-  })
-}
-
-const searchUserData = []
-for (let i = 0; i < 7; i++) {
-  searchUserData.push({
-    x: moment().add(i, 'days').format('YYYY-MM-DD'),
-    y: Math.ceil(Math.random() * 10)
-  })
-}
-const searchUserScale = [
-  {
-    dataKey: 'x',
-    alias: '时间'
-  },
-  {
-    dataKey: 'y',
-    alias: '用户数',
-    min: 0,
-    max: 10
-  }]
-
-const searchData = []
-for (let i = 0; i < 50; i += 1) {
-  searchData.push({
-    index: i + 1,
-    keyword: `搜索关键词-${i}`,
-    count: Math.floor(Math.random() * 1000),
-    range: Math.floor(Math.random() * 100),
-    status: Math.floor((Math.random() * 10) % 2)
-  })
-}
+import { axios } from '@/utils/request'
 
 const DataSet = require('@antv/data-set')
-
-const sourceData = [
-  { item: '家用电器', count: 32.2 },
-  { item: '食用酒水', count: 21 },
-  { item: '个护健康', count: 17 },
-  { item: '服饰箱包', count: 13 },
-  { item: '母婴产品', count: 9 },
-  { item: '其他', count: 7.8 }
-]
-
-const pieScale = [{
-  dataKey: 'percent',
-  min: 0,
-  formatter: '.0%'
-}]
-
-const dv = new DataSet.View().source(sourceData)
-dv.transform({
-  type: 'percent',
-  field: 'count',
-  dimension: 'item',
-  as: 'percent'
-})
-const pieData = dv.rows
 
 export default {
   name: 'Analysis',
@@ -320,20 +245,48 @@ export default {
   data () {
     return {
       loading: true,
-      rankList,
-
-      // 搜索用户数
-      searchUserData,
-      searchUserScale,
-      searchData,
-
-      barData,
-      barData2,
-
-      //
-      pieScale,
-      pieData,
-      sourceData,
+      rankList: [],
+      searchUserData: [],
+      searchUserScale: [
+        {
+          dataKey: 'x',
+          alias: '时间'
+        },
+        {
+          dataKey: 'y',
+          alias: '用户数',
+          min: 0,
+          max: 10
+        }
+      ],
+      searchData: [],
+      barData: [],
+      barData2: [],
+      pieScale: [{
+        dataKey: 'percent',
+        min: 0,
+        formatter: '.0%'
+      }],
+      pieData: [],
+      totalSales: {
+        total: '¥ 0',
+        weekGrowth: '0%',
+        dayGrowth: '0%',
+        daySales: '¥ 0'
+      },
+      visitData: {
+        total: 0,
+        dailyVisits: 0
+      },
+      payments: {
+        total: 0,
+        conversionRate: '0%'
+      },
+      operationalEffect: {
+        total: '0%',
+        weekGrowth: '0%',
+        dayGrowth: '0%'
+      },
       pieStyle: {
         stroke: '#fff',
         lineWidth: 1
@@ -342,34 +295,84 @@ export default {
   },
   computed: {
     searchTableColumns () {
-        return [
-      {
-        dataIndex: 'index',
-        title: this.$t('dashboard.analysis.table.rank'),
-        width: 90
-      },
-      {
-        dataIndex: 'keyword',
-        title: this.$t('dashboard.analysis.table.search-keyword')
-      },
-      {
-        dataIndex: 'count',
-        title: this.$t('dashboard.analysis.table.users')
-      },
-      {
-        dataIndex: 'range',
-        title: this.$t('dashboard.analysis.table.weekly-range'),
-        align: 'right',
-        sorter: (a, b) => a.range - b.range,
-        scopedSlots: { customRender: 'range' }
-      }
+      return [
+        {
+          dataIndex: 'index',
+          title: this.$t('dashboard.analysis.table.rank'),
+          width: 90
+        },
+        {
+          dataIndex: 'keyword',
+          title: this.$t('dashboard.analysis.table.search-keyword')
+        },
+        {
+          dataIndex: 'count',
+          title: this.$t('dashboard.analysis.table.users')
+        },
+        {
+          dataIndex: 'range',
+          title: this.$t('dashboard.analysis.table.weekly-range'),
+          align: 'right',
+          sorter: (a, b) => a.range - b.range,
+          scopedSlots: { customRender: 'range' }
+        }
       ]
     }
   },
+  methods: {
+    async fetchData () {
+      try {
+        const [
+          salesRes,
+          visitRes,
+          paymentsRes,
+          effectRes,
+          trendRes,
+          rankingRes,
+          searchRes,
+          proportionRes
+        ] = await Promise.all([
+          axios.get('/dashboard/analysis/total-sales'),
+          axios.get('/dashboard/analysis/visit-data'),
+          axios.get('/dashboard/analysis/payments'),
+          axios.get('/dashboard/analysis/operational-effect'),
+          axios.get('/dashboard/analysis/sales-trend'),
+          axios.get('/dashboard/analysis/sales-ranking'),
+          axios.get('/dashboard/analysis/search-data'),
+          axios.get('/dashboard/analysis/sales-proportion')
+        ])
+
+        this.totalSales = salesRes.result
+        this.visitData = visitRes.result
+        this.payments = paymentsRes.result
+        this.operationalEffect = effectRes.result
+        this.barData = trendRes.result
+        this.barData2 = trendRes.result // 使用相同数据用于访问趋势
+        this.rankList = rankingRes.result
+
+        // 处理搜索数据
+        const { userData, tableData } = searchRes.result
+        this.searchUserData = userData
+        this.searchData = tableData
+
+        // 处理销售占比数据
+        const dv = new DataSet.View().source(proportionRes.result)
+        dv.transform({
+          type: 'percent',
+          field: 'count',
+          dimension: 'item',
+          as: 'percent'
+        })
+        this.pieData = dv.rows
+      } catch (error) {
+        console.error('获取数据失败:', error)
+      } finally {
+        this.loading = false
+      }
+    }
+  },
   created () {
-    setTimeout(() => {
-      this.loading = !this.loading
-    }, 1000)
+    this.fetchData()
   }
 }
 </script>

@@ -15,7 +15,6 @@ const constantRouterComponents = {
   '500': () => import(/* webpackChunkName: "error" */ '@/views/exception/500'),
 
   // 你需要动态引入的页面组件
-  Workplace: () => import('@/views/dashboard/Workplace'),
   Analysis: () => import('@/views/dashboard/Analysis'),
 
   // form
@@ -36,20 +35,7 @@ const constantRouterComponents = {
 
   // result
   ResultSuccess: () => import(/* webpackChunkName: "result" */ '@/views/result/Success'),
-  ResultFail: () => import(/* webpackChunkName: "result" */ '@/views/result/Error'),
-
-  // exception
-  Exception403: () => import(/* webpackChunkName: "fail" */ '@/views/exception/403'),
-  Exception404: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),
-  Exception500: () => import(/* webpackChunkName: "fail" */ '@/views/exception/500'),
-
-  // account
-  AccountCenter: () => import('@/views/account/center'),
-  AccountSettings: () => import('@/views/account/settings/Index'),
-  BasicSetting: () => import('@/views/account/settings/BasicSetting'),
-  SecuritySettings: () => import('@/views/account/settings/Security'),
-
-  // 'TestWork': () => import(/* webpackChunkName: "TestWork" */ '@/views/dashboard/TestWork')
+  ResultFail: () => import(/* webpackChunkName: "result" */ '@/views/result/Error')
 }
 
 // 前端未找到页面路由（固定不用改）
