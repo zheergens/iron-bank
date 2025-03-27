@@ -6,6 +6,13 @@
     </span>
     <template v-slot:overlay>
       <a-menu class="ant-pro-drop-down menu" :selected-keys="[]">
+        <a-menu-item key="center">
+          <a href="http://www.baidu.com" target="_blank">
+            <a-icon type="user" />
+            个人中心
+          </a>
+        </a-menu-item>
+        <a-menu-divider />
         <a-menu-item key="logout" @click="handleLogout">
           <a-icon type="logout" />
           {{ $t('menu.account.logout') }}
